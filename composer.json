@@ -1,0 +1,21 @@
+{
+    "name": "mducharme/pdo-sync",
+    "description": "Synchronize between 2 databases with PDO.",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Mathieu Ducharme",
+            "email": "mat@locomotive.ca"
+        }
+    ],
+    "require": {
+        "php": "^5.5 || ^7.0",
+        "ext-pdo": "*",
+        "psr/log": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Mducharme\\PDOSync\\": "src/"
+        }
+    }
+}
