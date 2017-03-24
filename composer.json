@@ -17,5 +17,28 @@
         "psr-4": {
             "Mducharme\\PDOSync\\": "src/"
         }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Mducharme\\PDOSync\\Tests\\": "tests/"
+        }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^6.0",
+        "squizlabs/php_codesniffer": "^2.8"
+    },
+    "scripts": {
+        "test": [
+            "@tests"
+        ],
+        "tests": [
+            "@phplint",
+            "@phpcs",
+            "@phpunit"
+        ],
+        "phplint": "find {src,tests} -name '*.php' -print0 | xargs -0 -n1 -P8 php -l | grep -v '^No syntax errors detected'; test $? -eq 1",
+        "phpunit": "php vendor/bin/phpunit --configuration tests/phpunit.xml --coverage-text",
+        "phpcs": "php vendor/bin/phpcs --config-set ignore_warnings_on_exit 1;php vendor/bin/phpcs -ps --colors --standard=phpcs.xml src/",
+        "phpcbf": "php vendor/bin/phpcbf -ps --colors --standard=phpcs.xml src/ tests/"
     }
 }

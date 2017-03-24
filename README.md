@@ -1,5 +1,5 @@
-pdo-sync
-==========
+PDO-Sync
+========
 
 Synchronize between 2 databases with PDO.
 
@@ -23,11 +23,11 @@ $target = [
     'database'=>'remotedb'
 ];
 
-$sync = new \Mducharme\PDOSync\Synchronizer([
-    'logger' => new \Psr\Log\NullLogger(),
-    'source_database' => new \PDO(sprintf'mysql:host=%s;dbname=%s;', $source['host'], $source['database']), $source['username'], $source['password']),
-    'target_database' => new \PDO(sprintf('mysql:host=%s;dbname=%s;', $target['host'], $target['database']), $target['username'], $target['password'])
-]);
+$sourcePDO = new \PDO(sprintf('mysql:host=%s;dbname=%s;', $source['host'], $source['database']), $source['username'], $source['password']);
+$targetPDO = new \PDO(sprintf('mysql:host=%s;dbname=%s;', $target['host'], $target['database']), $target['username'], $target['password']);
+$logger = new \Psr\Log\NullLogger();
+
+$sync = new \Mducharme\PDOSync\Synchronizer($sourcePDO, $targetPDO, $logger);
 
 // Synchronize all tables
 $results = $sync();
@@ -35,6 +35,32 @@ $results = $sync();
 // Only synchronize 2 explicit tables
 $results = $sync(['table1', 'table2']);
 ```
+
+> Note that although this example demonstrates that the `Synchronizer` object is invokable,
+> it can be also run with a method: `$results = $sync->run($tables);`.
+
+## How it works
+
+This script copies all table data from a database (`source`) to another database (`target`).
+
+> Because it uses PDO for all operations, it can synchronize databases across 2 servers. As long as it can connect, it should be able to synchronize. 
+
+> Note that synchronizations across 2 different drivers might work but is **unsupported**.
+
+It first ensures that the table structure of the tables across both databases match, 
+then it creates a backup of the target's table and then deletes all the data (`truncate`). 
+It then fetch all the data from the source and inserts it in the target.
+If any error occurs, it restores the data from the backup, otherwise it deletes the backup.
+
+It returns an array containing the results as `skipped`, `errored` or `synced` (success).
+
+ - If a target table does not exist, it will be created.
+ - If a source table does not exist, it will be skipped.
+ - If a target table's structure is not exactly like the source's, it will be skipped.
+
+> This class **can** contain bugs that result in loss of data in certain scenarios.
+> Test thoroughly before using in a live environment; **at your own risk, there is no warranty**.
+
 
 ## Authors
 
@@ -44,6 +70,7 @@ $results = $sync(['table1', 'table2']);
 ## TODOs
 
 -   Test / support other database drivers and synchronization across different drivers.
+-   Unit tests using dbunit
 
 # License
 
