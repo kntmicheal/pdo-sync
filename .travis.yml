@@ -19,7 +19,6 @@ matrix:
 
 before_script:
     ## Init Composer
-    - composer selfupdate --quiet
     - composer install -n --dev
 
     ## Create temporary folders
@@ -33,7 +32,7 @@ script:
     - ./vendor/bin/phpcs --config-set ignore_warnings_on_exit 1;./vendor/bin/phpcs -ps --colors --standard=phpcs.xml src/
 
     ## Run PHPUnit Tests
-    - phpunit --configuration ./phpunit.xml --coverage-text --coverage-clover build/logs/clover.xml
+    - phpunit --coverage-text --coverage-clover build/logs/clover.xml
 
 after_script:
     - php vendor/bin/coveralls -v
